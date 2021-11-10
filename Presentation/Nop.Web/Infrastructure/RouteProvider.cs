@@ -32,6 +32,11 @@ namespace Nop.Web.Infrastructure
                 pattern: $"{lang}",
                 defaults: new { controller = "Home", action = "Index" });
 
+            //CustomerTeir
+            endpointRouteBuilder.MapControllerRoute(name: "CustomersTier",
+                pattern: $"{lang}",
+                defaults: new { controller = "CustomersTier", action = "Index" });
+
             //login
             endpointRouteBuilder.MapControllerRoute(name: "Login",
                 pattern: $"{lang}/login/",
@@ -686,6 +691,11 @@ namespace Nop.Web.Infrastructure
             endpointRouteBuilder.MapControllerRoute(name: "Error",
                 pattern: $"error",
                 defaults: new { controller = "Common", action = "Error" });
+
+            //cust tier
+            endpointRouteBuilder.MapControllerRoute(name: "customerTier",
+                 pattern: $"error",
+                 defaults: new { controller = "Common", action = "Error" });
 
             //page not found
             endpointRouteBuilder.MapControllerRoute(name: "PageNotFound",

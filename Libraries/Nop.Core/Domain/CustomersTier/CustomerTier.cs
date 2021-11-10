@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Nop.Core.Domain.CustomersTier
 {
-    class CustomerTier : BaseEntity
+    public class CustomerTier : BaseEntity
     {
         public string Name { get; set; }
         public string Description { get; set; }

@@ -31,6 +31,7 @@ namespace Nop.Web.Infrastructure
             services.AddScoped<IStoreMappingSupportedModelFactory, StoreMappingSupportedModelFactory>();
 
             //admin factories
+            services.AddScoped<ICustomerTierModelFactory, CustomerTierModelFactory>();
             services.AddScoped<IBaseAdminModelFactory, BaseAdminModelFactory>();
             services.AddScoped<IActivityLogModelFactory, ActivityLogModelFactory>();
             services.AddScoped<IAddressModelFactory, AddressModelFactory>();
@@ -108,6 +109,7 @@ namespace Nop.Web.Infrastructure
             services.AddScoped<Factories.ITopicModelFactory, Factories.TopicModelFactory>();
             services.AddScoped<Factories.IVendorModelFactory, Factories.VendorModelFactory>();
             services.AddScoped<Factories.IWidgetModelFactory, Factories.WidgetModelFactory>();
+
         }
 
         /// <summary>
