@@ -1,0 +1,64 @@
+﻿@model CustomersTierModel;
+@using Nop.Web.Areas.Admin.Models.CustomersTiers;
+@{
+   
+}
+
+<div asp-validation-summary="All"></div>
+<input asp-for="Id" type="hidden" />
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="form-horizontal">
+            <nop-cards id="customer-tier-cards">
+                <nop-card asp-name="poll-info" asp-icon="fas fa-info" asp-title="CustomerTier Info" asp-hide-block-attribute-name="hideInfoBlockAttributeName" asp-hide="false" asp-advanced="false">
+                    <div class="card-body">
+                        <div class="form-group row">
+                            <div class="col-md-3">
+                                <nop-label asp-for="Name" />
+                            </div>
+                            <div class="col-md-9">
+                                <nop-editor asp-for="Name" asp-required="true" />
+                                <span asp-validation-for="Name"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="col-md-3">
+                                <nop-label asp-for="Description" />
+                            </div>
+                            <div class="col-md-9">
+                                <nop-editor asp-for="Description" asp-required="true" />
+                                <span asp-validation-for="Description"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="col-md-3">
+                                <nop-label asp-for="DisplayOrder" />
+                            </div>
+                            <div class="col-md-9">
+                                <nop-editor asp-for="DisplayOrder" asp-required="true" />
+                                <span asp-validation-for="Description"></span>
+                            </div>
+                        </div>
+
+                    </div>
+</nop-card>
+            </nop-cards>
+            @*<div class="row">
+            <div class="col-md-6">
+                <label for="name">Name</label>
+                <input id="name" class="form-group" />
+            </div>
+
+            <div class="col-md-6">
+                <label for="Description">Description</label>
+                <textarea id="Description"  class="form-group" />
+            </div>
+
+
+        </div>*@
+        </div>
+    </div>
+</section>

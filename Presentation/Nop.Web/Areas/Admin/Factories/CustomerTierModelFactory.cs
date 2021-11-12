@@ -6,7 +6,6 @@ using Nop.Core.Domain.CustomersTier;
 using Nop.Services.Customers;
 using Nop.Services.Helpers;
 using Nop.Services.Localization;
-using Nop.Services.Polls;
 using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.CustomersTiers;
 using Nop.Web.Framework.Extensions;
@@ -19,14 +18,85 @@ namespace Nop.Web.Areas.Admin.Factories
     {
         private readonly ICustomerTierService _customerTierService;
         private readonly IBaseAdminModelFactory _baseAdminModelFactory;
+        private readonly IDateTimeHelper _dateTimeHelper;
+        private readonly ILanguageService _languageService;
+        private readonly IStoreMappingSupportedModelFactory _storeMappingSupportedModelFactory;
 
         public CustomerTierModelFactory(
             ICustomerTierService customerTierService,
-            IBaseAdminModelFactory baseAdminModelFactory
+            IBaseAdminModelFactory baseAdminModelFactory,
+            IDateTimeHelper dateTimeHelper,
+            ILanguageService languageService,
+            IStoreMappingSupportedModelFactory storeMappingSupportedModelFactory
             )
         {
             _customerTierService = customerTierService;
             _baseAdminModelFactory = baseAdminModelFactory;
+            _dateTimeHelper = dateTimeHelper;
+            _languageService = languageService;
+            _storeMappingSupportedModelFactory = storeMappingSupportedModelFactory;
+        }
+
+        public virtual async Task<CustomerTierListModel> GetAllCustomerTierList(CustomerTierSearchModel searchModel)
+        {
+            if (searchModel == null)
+                throw new ArgumentNullException(nameof(searchModel));
+            var custTier = await _customerTierService.GetAllCustomerTierList(showHidden: true,
+                storeId: searchModel.SearchStoreId,
+                pageIndex: searchModel.Page - 1, pageSize: searchModel.PageSize);//add def if not 
+
+
+            var model = await new CustomerTierListModel().PrepareToGridAsync(searchModel, custTier, () =>
+            {
+                return custTier.SelectAwait(async custTier =>
+                {
+                    //fill in model values from the entity
+                    var custTierModel = custTier.ToModel<CustomersTierModel>();
+
+                    //convert dates to the user time
+                    
+                    if (custTier.StartDateUtc.HasValue)
+                        custTierModel.StartDateUtc = await _dateTimeHelper.ConvertToUserTimeAsync(custTier.StartDateUtc.Value, DateTimeKind.Utc);
+                    if (custTier.EndDateUtc.HasValue)
+                        custTierModel.EndDateUtc = await _dateTimeHelper.ConvertToUserTimeAsync(custTier.EndDateUtc.Value, DateTimeKind.Utc);
+
+                    //fill in additional values (not existing in the entity)
+                    custTierModel.LanguageName = (await _languageService.GetLanguageByIdAsync(custTier.LanguageId))?.Name;
+
+                    return custTierModel;
+                });
+            });
+
+            return model;
+
+        }
+
+       
+
+
+        public virtual async Task<CustomersTierModel> PrepareCustomerTierModelAsync(CustomersTierModel model, CustomerTier tier, bool excludeProperties = false)
+        {
+            if (tier != null)
+            {
+                //fill in model values from the entity
+                model ??= tier.ToModel<CustomersTierModel>();
+
+                model.StartDateUtc = tier.StartDateUtc;
+                model.EndDateUtc = tier.EndDateUtc;
+
+                //prepare nested search model
+                //get forign key
+                //PreparePollAnswerSearchModel(model.PollAnswerSearchModel, tier);
+
+            }
+
+            //prepare available languages
+            await _baseAdminModelFactory.PrepareLanguagesAsync(model.AvailableLanguages, false);
+
+            //prepare available stores
+            await _storeMappingSupportedModelFactory.PrepareModelStoresAsync(model, tier, excludeProperties);
+
+            return model;
         }
 
         //public virtual  Task<CustomerTierListModel> PrepareCustomerTierSearchModelAsync(CustomerTierSearchModel searchModel)

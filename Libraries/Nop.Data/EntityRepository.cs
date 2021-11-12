@@ -131,6 +131,8 @@ namespace Nop.Data
         /// A task that represents the asynchronous operation
         /// The task result contains the entity entry
         /// </returns>
+        /// 
+
         public virtual async Task<TEntity> GetByIdAsync(int? id, Func<IStaticCacheManager, CacheKey> getCacheKey = null, bool includeDeleted = true)
         {
             if (!id.HasValue || id == 0)

@@ -638,6 +638,12 @@ namespace System.Linq
         /// <param name="pageSize">Page size</param>
         /// <param name="getOnlyTotalCount">A value in indicating whether you want to load only total number of records. Set to "true" if you don't want to load data from database</param>
         /// <returns>A task that represents the asynchronous operation</returns>
+
+        //public static async Task<int> getMas(this IQueryable<T> source, int pageIndex, int pageSize, bool getOnlyTotalCount = false)
+        //{
+
+        //}
+
         public static async Task<IPagedList<T>> ToPagedListAsync<T>(this IQueryable<T> source, int pageIndex, int pageSize, bool getOnlyTotalCount = false)
         {
             if (source == null)

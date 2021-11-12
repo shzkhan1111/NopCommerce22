@@ -98,6 +98,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             var model = await _pollModelFactory.PreparePollSearchModelAsync(new PollSearchModel());
 
             return View(model);
+
         }
 
         [HttpPost]
@@ -112,6 +113,8 @@ namespace Nop.Web.Areas.Admin.Controllers
 
             return Json(model);
         }
+
+
 
         /// <returns>A task that represents the asynchronous operation</returns>
         public virtual async Task<IActionResult> Create()

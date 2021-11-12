@@ -10,13 +10,16 @@ namespace Nop.Services.Customers
 {
     public interface ICustomerTierService
     {
-        Task<IPagedList<CustomerTier>> GetAllCustomerTierList(int languageId = 0, bool showHidden = false,
+        //Task<IPagedList<CustomerTier>> GetAllCustomerTierList(int languageId = 0, bool showHidden = false,
+        //    int pageIndex = 0, int pageSize = int.MaxValue);
+        Task<IPagedList<CustomerTier>> GetAllCustomerTierList(int storeId, int languageId = 0, bool showHidden = false,
+            bool loadShownOnHomepageOnly = false, string systemKeyword = null,
             int pageIndex = 0, int pageSize = int.MaxValue);
 
         Task DeleteCustomerTierAsync(CustomerTier customerTier);
         Task InsertCustomerTierAsync(CustomerTier customerTier);
         Task UpdateCustomerTierAsync(CustomerTier customerTier);
 
-        Task<CustomerTier> GetPollAnswerByIdAsync(int customerTierId);
+        Task<CustomerTier> GetCustomerTierByIdAsync(int customerTierId);
     }
 }

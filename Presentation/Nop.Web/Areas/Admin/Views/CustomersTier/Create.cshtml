@@ -1,0 +1,37 @@
+﻿@model CustomersTierModel
+@using Nop.Web.Areas.Admin.Models.CustomersTiers;
+@{
+    //page title
+    ViewBag.PageTitle = T("Admin.ContentManagement.Polls.AddNew").Text;
+    //active menu item (system name)
+    Html.SetActiveMenuItemSystemName("Polls");
+}
+
+
+<form asp-controller="CustomersTier" asp-action="Create" method="post">
+    <div class="content-header clearfix">
+        <h1 class="float-left">
+            @*@T("Admin.ContentManagement.Polls.AddNew")*@
+            Add New Customer Tier
+            <small>
+                <i class="fas fa-arrow-circle-left"></i>
+                @*<a asp-action="List">@T("Admin.ContentManagement.Polls.BackToList")</a>*@
+                <a asp-action="List">Back To Customer Tier</a>
+            </small>
+        </h1>
+
+        <div class="float-right">
+            <button type="submit" name="save" class="btn btn-primary">
+                <i class="far fa-save"></i>
+                @T("Admin.Common.Save")
+            </button>
+            <button type="submit" name="save-continue" class="btn btn-primary">
+                <i class="far fa-save"></i>
+                @T("Admin.Common.SaveContinue")
+            </button>
+            @await Component.InvokeAsync("AdminWidget", new { widgetZone = AdminWidgetZones.PollDetailsButtons })
+        </div>
+
+    </div>
+    @await Html.PartialAsync("_CreateOrUpdate", Model)
+</form>

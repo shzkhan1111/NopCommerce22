@@ -1,8 +1,9 @@
-﻿using Nop.Web.Framework.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Nop.Web.Framework.Models;
+using Nop.Web.Framework.Mvc.ModelBinding;
 
 namespace Nop.Web.Areas.Admin.Models.CustomersTiers
 {
@@ -13,6 +14,8 @@ namespace Nop.Web.Areas.Admin.Models.CustomersTiers
            
         }
 
+        [NopResourceDisplayName("Admin.ContentManagement.Polls.Fields.Language")]
+        public string LanguageName { get; set; }
         public int SearchStoreId { get; set; }
 
     }

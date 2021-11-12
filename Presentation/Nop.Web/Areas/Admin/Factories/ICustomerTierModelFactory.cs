@@ -18,5 +18,7 @@ namespace Nop.Web.Areas.Admin.Factories
     public partial interface ICustomerTierModelFactory
     {
         //public Task<CustomerTierListModel> PrepareCustomerTierSearchModelAsync(CustomerTierSearchModel searchModel);
+        Task<CustomerTierListModel> GetAllCustomerTierList(CustomerTierSearchModel searchModel);
+        Task<CustomersTierModel> PrepareCustomerTierModelAsync(CustomersTierModel model, CustomerTier tier, bool excludeProperties = false);
     }
 }

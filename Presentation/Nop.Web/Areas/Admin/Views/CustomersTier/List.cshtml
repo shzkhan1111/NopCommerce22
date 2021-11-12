@@ -30,6 +30,7 @@
             Add New
         </a>
         @*@await Component.InvokeAsync("AdminWidget", new { widgetZone = AdminWidgetZones.PollListButtons })*@
+        @*@Url.Action("" , "")*@
     </div>
 </div>
 
@@ -46,7 +47,7 @@
                    LengthMenu = Model.AvailablePageSizes,
                    Filters = new List<FilterParameter>
                    {
-
+                        new FilterParameter(nameof(Model.SearchStoreId))
                    },//BaseSearchModel
                    ColumnCollection = new List<ColumnProperty>
                    {

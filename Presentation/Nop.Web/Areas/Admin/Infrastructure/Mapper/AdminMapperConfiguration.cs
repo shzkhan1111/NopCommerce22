@@ -63,6 +63,8 @@ using Nop.Web.Areas.Admin.Models.Templates;
 using Nop.Web.Areas.Admin.Models.Topics;
 using Nop.Web.Areas.Admin.Models.Vendors;
 using Nop.Web.Framework.Models;
+using Nop.Core.Domain.CustomersTier;
+using Nop.Web.Areas.Admin.Models.CustomersTiers;
 
 namespace Nop.Web.Areas.Admin.Infrastructure.Mapper
 {
@@ -1406,6 +1408,9 @@ namespace Nop.Web.Areas.Admin.Infrastructure.Mapper
                 .ForMember(model => model.PollAnswerSearchModel, options => options.Ignore())
                 .ForMember(model => model.LanguageName, options => options.Ignore());
             CreateMap<PollModel, Poll>();
+
+            CreateMap<CustomerTier, CustomersTierModel>();
+            CreateMap<CustomersTierModel, CustomerTier>();
         }
 
         /// <summary>
