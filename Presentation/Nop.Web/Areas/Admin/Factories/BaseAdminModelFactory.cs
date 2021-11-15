@@ -61,6 +61,7 @@ namespace Nop.Web.Areas.Admin.Factories
         private readonly ITaxCategoryService _taxCategoryService;
         private readonly ITopicTemplateService _topicTemplateService;
         private readonly IVendorService _vendorService;
+        private readonly ICustomerTierService _customerTierService;
 
         #endregion
 
@@ -88,6 +89,7 @@ namespace Nop.Web.Areas.Admin.Factories
             IStoreService storeService,
             ITaxCategoryService taxCategoryService,
             ITopicTemplateService topicTemplateService,
+            ICustomerTierService customerTierService,
             IVendorService vendorService)
         {
             _categoryService = categoryService;
@@ -113,6 +115,8 @@ namespace Nop.Web.Areas.Admin.Factories
             _taxCategoryService = taxCategoryService;
             _topicTemplateService = topicTemplateService;
             _vendorService = vendorService;
+            _customerTierService = customerTierService;
+
         }
 
         #endregion
@@ -247,6 +251,35 @@ namespace Nop.Web.Areas.Admin.Factories
 
             return result;
         }
+
+        protected virtual async Task<List<SelectListItem>> GetCustomerTierListAsync(bool showHidden = true)
+        {
+            var cacheKey = _staticCacheManager.PrepareKeyForDefaultCache(NopModelCacheDefaults.CustomerTierListKey, showHidden);
+            var listItems = await _staticCacheManager.GetAsync(cacheKey, async () =>
+            {
+                //var vendors = await _vendorService.GetAllVendorsAsync(showHidden: showHidden);
+                var tiers = await _customerTierService.GetAllCustomerTierAsync();
+                return tiers.Select(v => new SelectListItem
+                {
+                    Text = v.Name,
+                    Value = v.Id.ToString()
+                });
+            });
+
+            var result = new List<SelectListItem>();
+            //clone the list to ensure that "selected" property is not set
+            foreach (var item in listItems)
+            {
+                result.Add(new SelectListItem
+                {
+                    Text = item.Text,
+                    Value = item.Value
+                });
+            }
+
+            return result;
+        }
+
 
         #endregion
 
@@ -580,11 +613,24 @@ namespace Nop.Web.Areas.Admin.Factories
             {
                 items.Add(vendorItem);
             }
+            //insert special item for the default value
+            await PrepareDefaultItemAsync(items, withSpecialDefaultItem, defaultItemText);
+        }
+        public virtual async Task PrepareCustomerTierAsync(IList<SelectListItem> items, bool withSpecialDefaultItem = true, string defaultItemText = null)
+        {
+            if (items == null)
+                throw new ArgumentNullException(nameof(items));
+
+            //prepare available vendors
+            var availableCustomerTierItems = await GetCustomerTierListAsync();
+            foreach (var customerTier in availableCustomerTierItems)
+            {
+                items.Add(customerTier);
+            }
 
             //insert special item for the default value
             await PrepareDefaultItemAsync(items, withSpecialDefaultItem, defaultItemText);
         }
-
         /// <summary>
         /// Prepare available product types
         /// </summary>

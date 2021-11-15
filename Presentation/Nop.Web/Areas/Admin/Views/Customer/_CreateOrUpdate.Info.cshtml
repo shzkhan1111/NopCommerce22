@@ -63,7 +63,7 @@
         </div>
         <div class="col-md-9">
             <div class="input-group">
-                <nop-editor asp-for="Password" autocomplete="new-password"/>
+                <nop-editor asp-for="Password" autocomplete="new-password" />
                 <div class="input-group-append">
                     @if (Model.Id > 0)
                     {
@@ -326,7 +326,7 @@
             <nop-label asp-for="SelectedCustomerRoleIds" />
         </div>
 
-        <div class="col-md-9">            
+        <div class="col-md-9">
             <div class="input-group-append input-group-required">
                 <div class="input-group">
                     <nop-select asp-for="SelectedCustomerRoleIds" asp-items="Model.AvailableCustomerRoles" asp-multiple="true" />
@@ -360,6 +360,17 @@
     </div>
     <div class="form-group row">
         <div class="col-md-3">
+            <nop-label asp-for="CustomerTierId" />
+        </div>
+        <div class="col-md-9">
+            <nop-select asp-for="CustomerTierId" asp-items="Model.AvailableCustomerTier" />
+            <span asp-validation-for="CustomerTierId"></span>
+            <em>Customer Tiers</em>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <div class="col-md-3">
             <nop-label asp-for="VendorId" />
         </div>
         <div class="col-md-9">
@@ -368,6 +379,10 @@
             <em>@T("Admin.Customers.Customers.VendorShouldBeInVendorsRole")</em>
         </div>
     </div>
+
+    
+
+
     @if (Model.AffiliateId > 0)
     {
         <div class="form-group row">
@@ -399,7 +414,7 @@
             </div>
             <div class="col-md-9">
                 <div class="input-group">
-                    <nop-editor asp-for="MultiFactorAuthenticationProvider" asp-disabled="true"/>
+                    <nop-editor asp-for="MultiFactorAuthenticationProvider" asp-disabled="true" />
                     <div class="input-group-append">
                         @if (Model.Id > 0)
                         {

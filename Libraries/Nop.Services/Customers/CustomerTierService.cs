@@ -37,6 +37,17 @@ namespace Nop.Services.Customers
         //    var query = _customerTierRepository.Table;
         //    return await query.ToPagedListAsync(pageIndex, pageSize);
         //}
+
+        public virtual async Task<IPagedList<CustomerTier>> GetAllCustomerTierAsync(
+           int pageIndex = 0, int pageSize = int.MaxValue)
+        {
+            var query = _customerTierRepository.Table;
+            //query = await _storeMappingService.ApplyStoreMapping(query, storeId);
+
+            query = query.OrderBy(tier => tier.DisplayOrder).ThenBy(tier => tier.Id);
+            return await query.ToPagedListAsync(pageIndex, pageSize);
+        }
+
         public virtual async Task<IPagedList<CustomerTier>> GetAllCustomerTierList(int storeId, int languageId = 0, bool showHidden = false,
             bool loadShownOnHomepageOnly = false, string systemKeyword = null,
             int pageIndex = 0, int pageSize = int.MaxValue)

@@ -137,6 +137,10 @@ namespace Nop.Web.Areas.Admin.Factories
         /// <returns>A task that represents the asynchronous operation</returns>
         Task PrepareVendorsAsync(IList<SelectListItem> items, bool withSpecialDefaultItem = true, string defaultItemText = null);
 
+        /// Prepare available Customer Tier
+        Task PrepareCustomerTierAsync(IList<SelectListItem> items, bool withSpecialDefaultItem = true, string defaultItemText = null);
+
+
         /// <summary>
         /// Prepare available product types
         /// </summary>

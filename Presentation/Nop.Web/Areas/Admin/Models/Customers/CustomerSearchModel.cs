@@ -16,6 +16,7 @@ namespace Nop.Web.Areas.Admin.Models.Customers
         {
             SelectedCustomerRoleIds = new List<int>();
             AvailableCustomerRoles = new List<SelectListItem>();
+            AvailableCustomerTier = new List<SelectListItem>();
         }
 
         #endregion
@@ -71,6 +72,8 @@ namespace Nop.Web.Areas.Admin.Models.Customers
 
         public bool AvatarEnabled { get; internal set; }
 
+        public int CustomerTierId { get; set; }
+        public IList<SelectListItem> AvailableCustomerTier { get; set; }
         #endregion
     }
 }

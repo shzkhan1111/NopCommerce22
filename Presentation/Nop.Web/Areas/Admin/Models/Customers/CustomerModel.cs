@@ -27,6 +27,7 @@ namespace Nop.Web.Areas.Admin.Models.Customers
             AvailableCountries = new List<SelectListItem>();
             AvailableStates = new List<SelectListItem>();
             AvailableVendors = new List<SelectListItem>();
+            AvailableCustomerTier = new List<SelectListItem>();
             CustomerAttributes = new List<CustomerAttributeModel>();
             AvailableNewsletterSubscriptionStores = new List<SelectListItem>();
             SelectedNewsletterSubscriptionStoreIds = new List<int>();
@@ -61,6 +62,10 @@ namespace Nop.Web.Areas.Admin.Models.Customers
         public int VendorId { get; set; }
 
         public IList<SelectListItem> AvailableVendors { get; set; }
+        
+        public int CustomerTierId { get; set; }
+
+        public IList<SelectListItem> AvailableCustomerTier { get; set; }
 
         //form fields & properties
         public bool GenderEnabled { get; set; }

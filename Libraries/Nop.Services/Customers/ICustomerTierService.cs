@@ -21,5 +21,8 @@ namespace Nop.Services.Customers
         Task UpdateCustomerTierAsync(CustomerTier customerTier);
 
         Task<CustomerTier> GetCustomerTierByIdAsync(int customerTierId);
+
+        Task<IPagedList<CustomerTier>> GetAllCustomerTierAsync(
+           int pageIndex = 0, int pageSize = int.MaxValue);
     }
 }

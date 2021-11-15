@@ -560,6 +560,8 @@ namespace Nop.Web.Areas.Admin.Factories
             searchModel.PhoneEnabled = _customerSettings.PhoneEnabled;
             searchModel.ZipPostalCodeEnabled = _customerSettings.ZipPostalCodeEnabled;
 
+            await _baseAdminModelFactory.PrepareCustomerTierAsync(searchModel.AvailableCustomerTier,
+                defaultItemText: await _localizationService.GetResourceAsync("Admin.Customers.Customers.Fields.Vendor.None"));
             //search registered customers by default
             var registeredRole = await _customerService.GetCustomerRoleBySystemNameAsync(NopCustomerDefaults.RegisteredRoleName);
             if (registeredRole != null)
@@ -603,7 +605,9 @@ namespace Nop.Web.Areas.Admin.Factories
                 phone: searchModel.SearchPhone,
                 zipPostalCode: searchModel.SearchZipPostalCode,
                 ipAddress: searchModel.SearchIpAddress,
-                pageIndex: searchModel.Page - 1, pageSize: searchModel.PageSize);
+                pageIndex: searchModel.Page - 1, pageSize: searchModel.PageSize,
+                tierId : searchModel.CustomerTierId
+                );
 
             //prepare list model
             var model = await new CustomerListModel().PrepareToGridAsync(searchModel, customers, () =>
@@ -673,12 +677,17 @@ namespace Nop.Web.Areas.Admin.Factories
                 model.MultiFactorAuthenticationProvider = await _genericAttributeService
                     .GetAttributeAsync<string>(customer, NopCustomerDefaults.SelectedMultiFactorAuthenticationProviderAttribute);
 
+                //fill tier list 
+                await _baseAdminModelFactory.PrepareCustomerTierAsync(model.AvailableCustomerTier,
+                defaultItemText: await _localizationService.GetResourceAsync("Admin.Customers.Customers.Fields.Vendor.None"));
+
                 //whether to fill in some of properties
                 if (!excludeProperties)
                 {
                     model.Email = customer.Email;
                     model.Username = customer.Username;
                     model.VendorId = customer.VendorId;
+                    model.CustomerTierId = customer.CustomerTierId;
                     model.AdminComment = customer.AdminComment;
                     model.IsTaxExempt = customer.IsTaxExempt;
                     model.Active = customer.Active;
@@ -778,6 +787,9 @@ namespace Nop.Web.Areas.Admin.Factories
 
             //prepare available vendors
             await _baseAdminModelFactory.PrepareVendorsAsync(model.AvailableVendors,
+                defaultItemText: await _localizationService.GetResourceAsync("Admin.Customers.Customers.Fields.Vendor.None"));
+
+            await _baseAdminModelFactory.PrepareCustomerTierAsync(model.AvailableCustomerTier,
                 defaultItemText: await _localizationService.GetResourceAsync("Admin.Customers.Customers.Fields.Vendor.None"));
 
             //prepare model customer attributes
