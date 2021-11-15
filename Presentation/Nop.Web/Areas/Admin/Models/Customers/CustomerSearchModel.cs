@@ -72,6 +72,7 @@ namespace Nop.Web.Areas.Admin.Models.Customers
 
         public bool AvatarEnabled { get; internal set; }
 
+        [NopResourceDisplayName("Customer Tier")]
         public int CustomerTierId { get; set; }
         public IList<SelectListItem> AvailableCustomerTier { get; set; }
         #endregion
