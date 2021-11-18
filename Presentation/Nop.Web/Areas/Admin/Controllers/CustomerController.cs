@@ -311,7 +311,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             //prepare model
             var model = await _customerModelFactory.PrepareCustomerModelAsync(new CustomerModel(), null);
 
-            return View(model);
+            return View(model); 
         }
 
         [HttpPost, ParameterBasedOnFormName("save-continue", "continueEditing")]
@@ -535,6 +535,7 @@ namespace Nop.Web.Areas.Admin.Controllers
 
             //try to get a customer with the specified id
             var customer = await _customerService.GetCustomerByIdAsync(model.Id);
+            bool previousActiveStatus = customer.Active;
             if (customer == null || customer.Deleted)
                 return RedirectToAction("List");
 
@@ -735,7 +736,7 @@ namespace Nop.Web.Areas.Admin.Controllers
                     //send email test
                     //SendCustomerRegisteredApprovedMessage
 
-                    if (!string.IsNullOrEmpty(customer.Email) && customer.Active)
+                    if (!string.IsNullOrEmpty(customer.Email) && customer.Active && !previousActiveStatus)
                     {
                         string firstName = await _genericAttributeService.GetAttributeAsync<string>(customer, Nop.Core.Domain.Customers.NopCustomerDefaults.FirstNameAttribute);
                         string lastName = await _genericAttributeService.GetAttributeAsync<string>(customer, Nop.Core.Domain.Customers.NopCustomerDefaults.LastNameAttribute);
