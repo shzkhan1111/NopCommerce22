@@ -95,6 +95,7 @@ namespace Nop.Web.Controllers
         private readonly MultiFactorAuthenticationSettings _multiFactorAuthenticationSettings;
         private readonly StoreInformationSettings _storeInformationSettings;
         private readonly TaxSettings _taxSettings;
+        
 
         #endregion
 

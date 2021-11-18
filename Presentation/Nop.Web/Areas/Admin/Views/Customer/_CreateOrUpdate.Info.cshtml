@@ -83,6 +83,7 @@
         <div class="col-md-9">
             <nop-editor asp-for="FirstName" />
             <span asp-validation-for="FirstName"></span>
+            
         </div>
     </div>
     <div class="form-group row">
@@ -342,7 +343,7 @@
                         customerRoleIdsInput: false,
                         filter: "contains"
                     });
-
+                
                     @if (Model.AvailableCustomerRoles.Count == 0)
                     {
                         <text>

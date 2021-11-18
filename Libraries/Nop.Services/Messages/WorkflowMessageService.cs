@@ -2306,7 +2306,64 @@ namespace Nop.Services.Messages
         /// A task that represents the asynchronous operation
         /// The task result contains the queued email identifier
         /// </returns>
+        /// 
+
         public virtual async Task<IList<int>> SendContactUsMessageAsync(int languageId, string senderEmail,
+           string senderName, string subject, string body)
+        {
+            var store = await _storeContext.GetCurrentStoreAsync();
+            languageId = await EnsureLanguageIsActiveAsync(languageId, store.Id);
+
+            var messageTemplates = await GetActiveMessageTemplatesAsync(MessageTemplateSystemNames.ContactUsMessage, store.Id);
+            if (!messageTemplates.Any())
+                return new List<int>();
+
+            //tokens
+            var commonTokens = new List<Token>
+            {
+                new Token("ContactUs.SenderEmail", senderEmail),
+                new Token("ContactUs.SenderName", senderName),
+                new Token("ContactUs.Body", body, true)
+            };
+
+            return await messageTemplates.SelectAwait(async messageTemplate =>
+            {
+                //email account
+                var emailAccount = await GetEmailAccountOfMessageTemplateAsync(messageTemplate, languageId);
+
+                var tokens = new List<Token>(commonTokens);
+                await _messageTokenProvider.AddStoreTokensAsync(tokens, store, emailAccount);
+
+                string fromEmail;
+                string fromName;
+                //required for some SMTP servers
+                if (_commonSettings.UseSystemEmailForContactUsForm)
+                {
+                    fromEmail = emailAccount.Email;
+                    fromName = emailAccount.DisplayName;
+                    body = $"<strong>From</strong>: {WebUtility.HtmlEncode(senderName)} - {WebUtility.HtmlEncode(senderEmail)}<br /><br />{body}";
+                }
+                else
+                {
+                    fromEmail = senderEmail;
+                    fromName = senderName;
+                }
+
+                //event notification
+                await _eventPublisher.MessageTokensAddedAsync(messageTemplate, tokens);
+
+                var toEmail = emailAccount.Email;
+                var toName = emailAccount.DisplayName;
+
+                return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName,
+                    fromEmail: fromEmail,
+                    fromName: fromName,
+                    subject: subject,
+                    replyToEmailAddress: senderEmail,
+                    replyToName: senderName);
+            }).ToListAsync();
+        }
+        public virtual async Task<IList<int>> SendCustomerRegisteredApprovedMessage(int languageId, string senderEmail,
             string senderName, string subject, string body)
         {
             var store = await _storeContext.GetCurrentStoreAsync();

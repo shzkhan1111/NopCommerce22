@@ -695,6 +695,8 @@ namespace Nop.Web.Areas.Admin.Controllers
                                 }
                             }
                         }
+                        //send email
+
                     }
 
                     var currentCustomerRoleIds = await _customerService.GetCustomerRoleIdsAsync(customer, true);
@@ -730,6 +732,23 @@ namespace Nop.Web.Areas.Admin.Controllers
                     }
 
                     await _customerService.UpdateCustomerAsync(customer);
+                    //send email test
+                    //SendCustomerRegisteredApprovedMessage
+
+                    if (!string.IsNullOrEmpty(customer.Email) && customer.Active)
+                    {
+                        string firstName = await _genericAttributeService.GetAttributeAsync<string>(customer, Nop.Core.Domain.Customers.NopCustomerDefaults.FirstNameAttribute);
+                        string lastName = await _genericAttributeService.GetAttributeAsync<string>(customer, Nop.Core.Domain.Customers.NopCustomerDefaults.LastNameAttribute);
+
+                        string fullName = firstName + " " + lastName;
+                        await _workflowMessageService.SendCustomerRegisteredApprovedMessage((await _workContext.GetWorkingLanguageAsync()).Id,
+                        model.Email.Trim(),
+                        fullName,
+                        await _localizationService.GetResourceAsync("customer.registration.confirm.email.subject"),
+                        await _localizationService.GetResourceAsync("customer.registration.confirm.email.body")
+                    );//function ends
+                    }
+
 
                     //ensure that a customer with a vendor associated is not in "Administrators" role
                     //otherwise, he won't have access to the other functionality in admin area
@@ -1218,7 +1237,7 @@ namespace Nop.Web.Areas.Admin.Controllers
                 ?? throw new ArgumentException("No customer found with the specified id", nameof(customerId));
 
             //try to get an address with the specified id
-            var address = await _customerService.GetCustomerAddressAsync(customer.Id, id);            
+            var address = await _customerService.GetCustomerAddressAsync(customer.Id, id);
 
             if (address == null)
                 return Content("No address found with the specified id");

@@ -575,6 +575,8 @@ namespace Nop.Services.Messages
         /// A task that represents the asynchronous operation
         /// The task result contains the queued email identifier
         /// </returns>
+        /// 
+        Task<IList<int>> SendCustomerRegisteredApprovedMessage(int languageId, string senderEmail, string senderName, string subject, string body);
         Task<IList<int>> SendContactUsMessageAsync(int languageId, string senderEmail, string senderName, string subject, string body);
 
         /// <summary>
