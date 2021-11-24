@@ -83,6 +83,8 @@ namespace Nop.Web.Areas.Admin.Factories
         private readonly MediaSettings _mediaSettings;
         private readonly RewardPointsSettings _rewardPointsSettings;
         private readonly TaxSettings _taxSettings;
+        private readonly IStoreMappingSupportedModelFactory _storeMappingSupportedModelFactory;
+
 
         #endregion
 
@@ -125,6 +127,7 @@ namespace Nop.Web.Areas.Admin.Factories
             ITaxService taxService,
             MediaSettings mediaSettings,
             RewardPointsSettings rewardPointsSettings,
+            IStoreMappingSupportedModelFactory storeMappingSupportedModelFactory,
             TaxSettings taxSettings)
         {
             _addressSettings = addressSettings;
@@ -165,6 +168,7 @@ namespace Nop.Web.Areas.Admin.Factories
             _mediaSettings = mediaSettings;
             _rewardPointsSettings = rewardPointsSettings;
             _taxSettings = taxSettings;
+            _storeMappingSupportedModelFactory = storeMappingSupportedModelFactory;
         }
 
         #endregion
@@ -570,6 +574,7 @@ namespace Nop.Web.Areas.Admin.Factories
             //prepare available customer roles
             await _aclSupportedModelFactory.PrepareModelCustomerRolesAsync(searchModel);
 
+
             //prepare page parameters
             searchModel.SetGridPageSize();
 
@@ -606,7 +611,8 @@ namespace Nop.Web.Areas.Admin.Factories
                 zipPostalCode: searchModel.SearchZipPostalCode,
                 ipAddress: searchModel.SearchIpAddress,
                 pageIndex: searchModel.Page - 1, pageSize: searchModel.PageSize,
-                tierId : searchModel.CustomerTierId
+                tierId : searchModel.CustomerTierId,
+                RegisteredInStore : (await _storeContext.GetCurrentStoreAsync()).Id
                 );
 
             //prepare list model
@@ -802,6 +808,11 @@ namespace Nop.Web.Areas.Admin.Factories
                 Text = store.Name,
                 Selected = model.SelectedNewsletterSubscriptionStoreIds.Contains(store.Id)
             }).ToList();
+
+
+            //prepares Stores
+            //await _storeMappingSupportedModelFactory.PrepareModelStoresAsync(model, customer, excludeProperties);
+            //await _storeMappingSupportedModelFactory.PrepareModelStoresAsync(model, customer, excludeProperties);
 
             //prepare model customer roles
             await _aclSupportedModelFactory.PrepareModelCustomerRolesAsync(model);

@@ -52,6 +52,7 @@ namespace Nop.Web.Areas.Admin.Controllers
         private readonly IStoreService _storeService;
         private readonly IUrlRecordService _urlRecordService;
         private readonly IWorkContext _workContext;
+        private readonly IStoreContext _storeContext;
 
         #endregion
 
@@ -75,6 +76,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             IStoreMappingService storeMappingService,
             IStoreService storeService,
             IUrlRecordService urlRecordService,
+            IStoreContext storeContext,
             IWorkContext workContext)
         {
             _aclService = aclService;
@@ -96,6 +98,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             _storeService = storeService;
             _urlRecordService = urlRecordService;
             _workContext = workContext;
+            _storeContext = storeContext;
         }
 
         #endregion
@@ -286,6 +289,11 @@ namespace Nop.Web.Areas.Admin.Controllers
                 await SaveCategoryAclAsync(category, model);
 
                 //stores
+                int storeId = (await _storeContext.GetCurrentStoreAsync()).Id;
+                if (storeId != 1)
+                {
+                    model.SelectedStoreIds.Add(storeId);
+                }
                 await SaveStoreMappingsAsync(category, model);
 
                 //activity log

@@ -1065,7 +1065,7 @@ namespace Nop.Services.Catalog
             //ACL mapping
             if (!showHidden)
                 products = await products.WhereAwait(async x => await _aclService.AuthorizeAsync(x)).ToListAsync();
-
+                
             //Store mapping
             if (!showHidden && storeId > 0)
                 products = await products.WhereAwait(async x => await _storeMappingService.AuthorizeAsync(x, storeId)).ToListAsync();

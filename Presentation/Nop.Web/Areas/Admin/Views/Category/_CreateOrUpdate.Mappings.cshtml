@@ -1,5 +1,13 @@
 ﻿@model CategoryModel
+@using Nop.Services
+@using Nop.Services.Stores
 
+@inject IStoreService storeService;
+@inject IStoreContext _storeContext;
+
+@{
+    var currentStoreId = (await _storeContext.GetCurrentStoreAsync()).Id;
+}
 <div class="card-body">
     <div class="form-group advanced-setting row">
         <div class="col-md-3">
@@ -71,7 +79,7 @@
         <div class="col-md-3">
             <nop-label asp-for="SelectedStoreIds" />
         </div>
-        <div class="col-md-9">
+        <div class="col-md-9" style="@(currentStoreId != 1 ?"pointer-events: none;": "" )">
             <div class="row">
                 <div class="col-md-4">
                     <nop-select asp-for="SelectedStoreIds" asp-items="Model.AvailableStores" asp-multiple="true" />

@@ -140,7 +140,9 @@ namespace Nop.Services.Customers
             string email = null, string username = null, string firstName = null, string lastName = null,
             int dayOfBirth = 0, int monthOfBirth = 0,
             string company = null, string phone = null, string zipPostalCode = null, string ipAddress = null,
-            int pageIndex = 0, int pageSize = int.MaxValue, bool getOnlyTotalCount = false , int tierId = 0)
+            int pageIndex = 0, int pageSize = int.MaxValue, bool getOnlyTotalCount = false , int tierId = 0,
+            int RegisteredInStore = 1
+            )
         {
             var customers = await _customerRepository.GetAllPagedAsync(query =>
             {
@@ -279,6 +281,8 @@ namespace Nop.Services.Customers
                 {
                     query = query.Where(w => w.LastIpAddress == ipAddress);
                 }
+                //for store filter mandetory 
+                query = query.Where(w => w.RegisteredInStoreId == RegisteredInStore);
 
                 query = query.OrderByDescending(c => c.CreatedOnUtc);
 

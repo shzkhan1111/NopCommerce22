@@ -194,6 +194,28 @@ namespace Nop.Services.Stores
             return await _staticCacheManager.GetAsync(key, () => query.ToArray());
         }
 
+        //made new 
+        //public virtual async Task<int[]> GetEntityIdsWithForAllEntityAccessAsync<TEntity>(TEntity entity) where TEntity : BaseEntity, IStoreMappingSupported
+        public virtual async Task<int[]> GetEntityIdsWithForAllEntityAccessAsync<TEntity>(TEntity entity) where TEntity : BaseEntity, IStoreMappingSupported
+        {
+            //if (entity == null)
+            //    throw new ArgumentNullException(nameof(entity));
+
+            //var entityId = entity.Id;
+            var entityName = entity.GetType().Name;
+
+            //var key = _staticCacheManager.PrepareKeyForDefaultCache(NopStoreDefaults.StoreMappingIdsCacheKey, entityId, entityName);
+            //var key = _staticCacheManager.PrepareKeyForDefaultCache(NopStoreDefaults.StoreMappingIdsCacheKey , entityName);
+            int storeId = (await _storeContext.GetCurrentStoreAsync()).Id;
+            var query = from sm in _storeMappingRepository.Table
+                        where sm.EntityName == entityName && sm.StoreId == storeId
+                        select sm.EntityId;
+
+            //return await _staticCacheManager.GetAsync(key, () => query.ToArray());
+
+            return query.ToArray();
+        }
+
         /// <summary>
         /// Authorize whether entity could be accessed in the current store (mapped to this store)
         /// </summary>

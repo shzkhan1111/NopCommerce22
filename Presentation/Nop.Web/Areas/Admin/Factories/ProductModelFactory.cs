@@ -77,6 +77,9 @@ namespace Nop.Web.Areas.Admin.Factories
         private readonly MeasureSettings _measureSettings;
         private readonly TaxSettings _taxSettings;
         private readonly VendorSettings _vendorSettings;
+        private readonly IStoreMappingService _storeMappingService;
+        private readonly IStoreContext _storeContext;
+
 
         #endregion
 
@@ -116,6 +119,8 @@ namespace Nop.Web.Areas.Admin.Factories
             IWorkContext workContext,
             MeasureSettings measureSettings,
             TaxSettings taxSettings,
+            IStoreMappingService storeMappingService,
+            IStoreContext storeContext,
             VendorSettings vendorSettings)
         {
             _catalogSettings = catalogSettings;
@@ -153,6 +158,9 @@ namespace Nop.Web.Areas.Admin.Factories
             _workContext = workContext;
             _taxSettings = taxSettings;
             _vendorSettings = vendorSettings;
+            _storeMappingService = storeMappingService;
+            _storeContext = storeContext;
+
         }
 
         #endregion
@@ -738,6 +746,26 @@ namespace Nop.Web.Areas.Admin.Factories
                 pageIndex: searchModel.Page - 1, pageSize: searchModel.PageSize,
                 overridePublished: overridePublished);
 
+            //product By store
+            //int[] storeId = await _storeMappingService.GetStoresIdsWithAccessAsync(products);
+            int storeId = (await _storeContext.GetCurrentStoreAsync()).Id;
+            //products = await products.WhereAwait(async x => await _storeMappingService.AuthorizeAsync(x, storeId)).ToListAsync();
+
+            //Product product = new Product();
+            //var query = from sm in _storeMappingRepository.Table
+            //            where sm.EntityId == entityId &&
+            //                  sm.EntityName == product.GetType().Name   
+            //            select sm.StoreId;
+
+            //products = await products.WhereAwait(async x => await _storeMappingService.AuthorizeAsync(x, storeId)).ToListAsync();
+            //if (storeId != 1)
+            //{
+            //    //all code here 
+            //}
+            Product p = new Product();
+            int[] entitiesInStore = await _storeMappingService.GetEntityIdsWithForAllEntityAccessAsync(p);
+            //products.Where(x => entitiesInStore.Contains(x.Id)).ToList();
+            //products = products.Where(x => entitiesInStore.Contains(x.Id)).ToPagedListAsync(pageIndex, pageSize);
             //prepare list model
             var model = await new ProductListModel().PrepareToGridAsync(searchModel, products, () =>
             {
@@ -758,14 +786,14 @@ namespace Nop.Web.Areas.Admin.Factories
                         productModel.StockQuantityStr = (await _productService.GetTotalStockQuantityAsync(product)).ToString();
 
                     return productModel;
-                });
+                }).Where(x => entitiesInStore.Contains(x.Id) || storeId == 1);
             });
 
             return model;
         }
 
         /// <summary>
-        /// Prepare product model
+        /// Prepare product model   
         /// </summary>
         /// <param name="model">Product model</param>
         /// <param name="product">Product</param>
@@ -944,7 +972,9 @@ namespace Nop.Web.Areas.Admin.Factories
 
             //prepare model stores
             await _storeMappingSupportedModelFactory.PrepareModelStoresAsync(model, product, excludeProperties);
-
+            
+            
+            
             var productTags = await _productTagService.GetAllProductTagsAsync();
             var productTagsSb = new StringBuilder();
             productTagsSb.Append("var initialProductTags = [");

@@ -61,6 +61,8 @@ namespace Nop.Services.Stores
         /// </returns>
         Task<int[]> GetStoresIdsWithAccessAsync<TEntity>(TEntity entity) where TEntity : BaseEntity, IStoreMappingSupported;
 
+        Task<int[]> GetEntityIdsWithForAllEntityAccessAsync<TEntity>(TEntity entity) where TEntity : BaseEntity, IStoreMappingSupported;
+
         /// <summary>
         /// Authorize whether entity could be accessed in the current store (mapped to this store)
         /// </summary>

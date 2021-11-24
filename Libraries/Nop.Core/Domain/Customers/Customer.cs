@@ -1,12 +1,13 @@
 ﻿using System;
 using Nop.Core.Domain.Common;
+using Nop.Core.Domain.Stores;
 
 namespace Nop.Core.Domain.Customers
 {
     /// <summary>
     /// Represents a customer
     /// </summary>
-    public partial class Customer : BaseEntity, ISoftDeletedEntity
+    public partial class Customer : BaseEntity, ISoftDeletedEntity , IStoreMappingSupported
     {
         public Customer()
         {
@@ -18,6 +19,10 @@ namespace Nop.Core.Domain.Customers
         /// </summary>
         public Guid CustomerGuid { get; set; }
 
+        /// <summary>
+        /// Gets or sets the customer GUID
+        /// </summary>
+        
         /// <summary>
         /// Gets or sets the username
         /// </summary>
@@ -137,5 +142,8 @@ namespace Nop.Core.Domain.Customers
         /// Gets or sets the shipping address identifier
         /// </summary>
         public int? ShippingAddressId { get; set; }
+
+        public bool LimitedToStores { get; set; }
+
     }
 }

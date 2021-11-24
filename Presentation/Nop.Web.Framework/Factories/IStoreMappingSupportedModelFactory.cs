@@ -29,5 +29,9 @@ namespace Nop.Web.Framework.Factories
         /// <returns>A task that represents the asynchronous operation</returns>
         Task PrepareModelStoresAsync<TModel, TEntity>(TModel model, TEntity entity, bool ignoreStoreMappings)
             where TModel : IStoreMappingSupportedModel where TEntity : BaseEntity, IStoreMappingSupported;
+
+        Task PrepareModelStoresAsyncAll<TModel, TEntity>(TModel model, TEntity entity, bool ignoreStoreMappings)
+            where TModel : IStoreMappingSupportedModel where TEntity : BaseEntity, IStoreMappingSupported;
+
     }
 }

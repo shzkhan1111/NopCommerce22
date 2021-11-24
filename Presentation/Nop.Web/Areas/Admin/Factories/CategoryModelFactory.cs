@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Nop.Core;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Directory;
 using Nop.Core.Domain.Discounts;
@@ -11,6 +12,7 @@ using Nop.Services.Directory;
 using Nop.Services.Discounts;
 using Nop.Services.Localization;
 using Nop.Services.Seo;
+using Nop.Services.Stores;
 using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Catalog;
 using Nop.Web.Framework.Extensions;
@@ -39,6 +41,8 @@ namespace Nop.Web.Areas.Admin.Factories
         private readonly IProductService _productService;
         private readonly IStoreMappingSupportedModelFactory _storeMappingSupportedModelFactory;
         private readonly IUrlRecordService _urlRecordService;
+        private readonly IStoreMappingService _storeMappingService;
+        private readonly IStoreContext _storeContext;
 
         #endregion
 
@@ -56,6 +60,9 @@ namespace Nop.Web.Areas.Admin.Factories
             ILocalizedModelFactory localizedModelFactory,
             IProductService productService,
             IStoreMappingSupportedModelFactory storeMappingSupportedModelFactory,
+            IStoreMappingService storeMappingService,
+            IStoreContext storeContext ,
+
             IUrlRecordService urlRecordService)
         {
             _catalogSettings = catalogSettings;
@@ -71,6 +78,8 @@ namespace Nop.Web.Areas.Admin.Factories
             _productService = productService;
             _storeMappingSupportedModelFactory = storeMappingSupportedModelFactory;
             _urlRecordService = urlRecordService;
+            _storeMappingService = storeMappingService;
+            _storeContext = storeContext;
         }
 
         #endregion
@@ -162,6 +171,12 @@ namespace Nop.Web.Areas.Admin.Factories
                 storeId: searchModel.SearchStoreId,
                 pageIndex: searchModel.Page - 1, pageSize: searchModel.PageSize,
                 overridePublished: searchModel.SearchPublishedId == 0 ? null : (bool?)(searchModel.SearchPublishedId == 1));
+            //for mapping 
+
+            int storeId = (await _storeContext.GetCurrentStoreAsync()).Id;
+            Category category = new Category();
+            int[] entitiesInStore = await _storeMappingService.GetEntityIdsWithForAllEntityAccessAsync(category);
+            //categories.Where(x => entitiesInStore.Contains(x.Id)).ToList();
 
             //prepare grid model
             var model = await new CategoryListModel().PrepareToGridAsync(searchModel, categories, () =>
@@ -176,7 +191,7 @@ namespace Nop.Web.Areas.Admin.Factories
                     categoryModel.SeName = await _urlRecordService.GetSeNameAsync(category, 0, true, false);
 
                     return categoryModel;
-                });
+                }).Where(x => entitiesInStore.Contains(x.Id) || storeId == 1);
             });
 
             return model;

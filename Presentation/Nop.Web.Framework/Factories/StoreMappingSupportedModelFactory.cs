@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -18,16 +19,18 @@ namespace Nop.Web.Framework.Factories
         
         private readonly IStoreMappingService _storeMappingService;
         private readonly IStoreService _storeService;
+        private readonly IStoreContext _storeContext;
 
         #endregion
 
         #region Ctor
 
         public StoreMappingSupportedModelFactory(IStoreMappingService storeMappingService,
-            IStoreService storeService)
+            IStoreService storeService , IStoreContext storeContext )
         {
             _storeMappingService = storeMappingService;
             _storeService = storeService;
+            _storeContext = storeContext;
         }
 
         #endregion
@@ -42,6 +45,8 @@ namespace Nop.Web.Framework.Factories
         /// <returns>A task that represents the asynchronous operation</returns>
         public virtual async Task PrepareModelStoresAsync<TModel>(TModel model) where TModel : IStoreMappingSupportedModel
         {
+            var storeId = (await _storeContext.GetCurrentStoreAsync()).Id;
+
             if (model == null)
                 throw new ArgumentNullException(nameof(model));
 
@@ -52,7 +57,7 @@ namespace Nop.Web.Framework.Factories
                 Text = store.Name,
                 Value = store.Id.ToString(),
                 Selected = model.SelectedStoreIds.Contains(store.Id)
-            }).ToList();
+            }).Where(x => x.Value == storeId.ToString() || storeId == 1).ToList();
         }
 
         /// <summary>
@@ -64,7 +69,7 @@ namespace Nop.Web.Framework.Factories
         /// <param name="entity">Entity</param>
         /// <param name="ignoreStoreMappings">Whether to ignore existing store mappings</param>
         /// <returns>A task that represents the asynchronous operation</returns>
-        public virtual async Task PrepareModelStoresAsync<TModel, TEntity>(TModel model, TEntity entity, bool ignoreStoreMappings)
+        public virtual async Task PrepareModelStoresAsyncAll<TModel, TEntity>(TModel model, TEntity entity, bool ignoreStoreMappings)
             where TModel : IStoreMappingSupportedModel where TEntity : BaseEntity, IStoreMappingSupported
         {
             if (model == null)
@@ -76,7 +81,35 @@ namespace Nop.Web.Framework.Factories
 
             await PrepareModelStoresAsync(model);
         }
-        
+        public virtual async Task PrepareModelStoresAsync<TModel, TEntity>(TModel model, TEntity entity, bool ignoreStoreMappings)
+            where TModel : IStoreMappingSupportedModel where TEntity : BaseEntity, IStoreMappingSupported
+        {
+            IList<int> storeIdArray = new List<int>();
+            int storeId = 0;
+            if (model == null)
+                throw new ArgumentNullException(nameof(model));
+
+            //prepare stores with granted access
+            if (!ignoreStoreMappings && entity != null)
+            {
+                storeId = (await _storeContext.GetCurrentStoreAsync()).Id;
+                if (storeId == 1)
+                {
+                    model.SelectedStoreIds = (await _storeMappingService.GetStoresIdsWithAccessAsync(entity)).ToList();
+                }
+                else
+                {
+                    storeIdArray.Add(storeId);
+                    model.SelectedStoreIds = storeIdArray;
+                }
+
+            }
+
+
+            await PrepareModelStoresAsync(model);
+        }
+
+
         #endregion
     }
 }

@@ -140,6 +140,8 @@ namespace Nop.Services.Customers
                 await _customerService.GetCustomerByUsernameAsync(usernameOrEmail) :
                 await _customerService.GetCustomerByEmailAsync(usernameOrEmail);
 
+
+
             if (customer == null)
                 return CustomerLoginResults.CustomerNotExist;
             if (customer.Deleted)
@@ -152,6 +154,9 @@ namespace Nop.Services.Customers
             //check whether a customer is locked out
             if (customer.CannotLoginUntilDateUtc.HasValue && customer.CannotLoginUntilDateUtc.Value > DateTime.UtcNow)
                 return CustomerLoginResults.LockedOut;
+            int tempStoreId = (await _storeContext.GetCurrentStoreAsync()).Id;
+            if (customer.RegisteredInStoreId != tempStoreId)
+                return CustomerLoginResults.NotRegistered;
 
             if (!PasswordsMatch(await _customerService.GetCurrentPasswordAsync(customer.Id), password))
             {

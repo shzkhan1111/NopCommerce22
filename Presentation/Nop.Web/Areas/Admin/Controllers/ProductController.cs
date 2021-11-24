@@ -76,6 +76,7 @@ namespace Nop.Web.Areas.Admin.Controllers
         private readonly IGenericAttributeService _genericAttributeService;
         private readonly IWorkContext _workContext;
         private readonly VendorSettings _vendorSettings;
+        
 
         #endregion
 
@@ -874,6 +875,11 @@ namespace Nop.Web.Areas.Admin.Controllers
                 await SaveProductAclAsync(product, model);
 
                 //stores
+                int storeId = (await _storeContext.GetCurrentStoreAsync()).Id;
+                if (storeId != 1)
+                {
+                    model.SelectedStoreIds.Add(storeId);
+                }
                 await _productService.UpdateProductStoreMappingsAsync(product, model.SelectedStoreIds);
 
                 //discounts
