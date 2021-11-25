@@ -66,6 +66,7 @@ namespace Nop.Web.Areas.Admin.Controllers
         private readonly IWorkContext _workContext;
         private readonly IWorkflowMessageService _workflowMessageService;
         private readonly OrderSettings _orderSettings;
+        private readonly IStoreContext _storeContext;
 
         #endregion
 
@@ -98,6 +99,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             IShoppingCartService shoppingCartService,
             IWorkContext workContext,
             IWorkflowMessageService workflowMessageService,
+            IStoreContext storeContext,
             OrderSettings orderSettings)
         {
             _addressAttributeParser = addressAttributeParser;
@@ -128,6 +130,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             _workContext = workContext;
             _workflowMessageService = workflowMessageService;
             _orderSettings = orderSettings;
+            _storeContext = storeContext;
         }
 
         #endregion
@@ -212,17 +215,19 @@ namespace Nop.Web.Areas.Admin.Controllers
                 PaymentStatusIds = paymentStatuses,
                 ShippingStatusIds = shippingStatuses
             });
-
+            model.StoreId = (await _storeContext.GetCurrentStoreAsync()).Id;
             return View(model);
         }
 
         [HttpPost]
         /// <returns>A task that represents the asynchronous operation</returns>
         public virtual async Task<IActionResult> OrderList(OrderSearchModel searchModel)
-        {
+            {
             if (!await _permissionService.AuthorizeAsync(StandardPermissionProvider.ManageOrders))
                 return await AccessDeniedDataTablesJson();
 
+            //get order by store 
+            searchModel.StoreId = (await _storeContext.GetCurrentStoreAsync()).Id;
             //prepare model
             var model = await _orderModelFactory.PrepareOrderListModelAsync(searchModel);
 
@@ -236,6 +241,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             if (!await _permissionService.AuthorizeAsync(StandardPermissionProvider.ManageOrders))
                 return await AccessDeniedDataTablesJson();
 
+            searchModel.StoreId = (await _storeContext.GetCurrentStoreAsync()).Id;
             //prepare model
             var model = await _orderModelFactory.PrepareOrderAggregatorModelAsync(searchModel);
 
