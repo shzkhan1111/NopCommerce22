@@ -212,7 +212,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             var model = await _orderModelFactory.PrepareOrderSearchModelAsync(new OrderSearchModel
             {
                 OrderStatusIds = orderStatuses,
-                PaymentStatusIds = paymentStatuses,
+                PaymentStatusIds = paymentStatuses, 
                 ShippingStatusIds = shippingStatuses
             });
             model.StoreId = (await _storeContext.GetCurrentStoreAsync()).Id;
