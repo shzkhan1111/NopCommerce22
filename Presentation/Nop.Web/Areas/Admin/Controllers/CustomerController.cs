@@ -304,7 +304,7 @@ namespace Nop.Web.Areas.Admin.Controllers
 
         /// <returns>A task that represents the asynchronous operation</returns>
         public virtual async Task<IActionResult> Create()
-        {
+            {
             if (!await _permissionService.AuthorizeAsync(StandardPermissionProvider.ManageCustomers))
                 return AccessDeniedView();
 

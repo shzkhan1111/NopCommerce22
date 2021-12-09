@@ -1,5 +1,5 @@
 ﻿{
-  "DataConnectionString": "Data Source=tcp:nopweb-dist.database.windows.net,1433;Initial Catalog=nopCommerce_Test;Integrated Security=False;Persist Security Info=False;User ID=nopadmin;Password=P@ssword",
+  "DataConnectionString": "Data Source=DESKTOP-E30NNSG\\SQLEXPRESS;Initial Catalog=nopCommerceDb2;Integrated Security=True;Persist Security Info=False",
   "DataProvider": "sqlserver",
   "SQLCommandTimeout": null,
   "RawDataSettings": {}
