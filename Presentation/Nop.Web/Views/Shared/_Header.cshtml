@@ -17,9 +17,29 @@
         <div class="header-logo">
             @await Component.InvokeAsync("Logo")
         </div>
+        
         <div class="search-box store-search-box">
             @await Component.InvokeAsync("SearchBox")
         </div>
     </div>
+
+    <div class="header-lower" style="margin-top:-40px;margin-bottom:-10px;">
+        <div class="header-logo">
+        </div>
+        <nav class="navbar navbar-default">
+            <a href="/" style="color: #21c7df; font-size: 15px; font-weight: 600;">HOME</a> |
+            <a href="/combi-cutters-installation-tools" style="color: #21c7df; font-size: 15px; font-weight: 600 ">PRODUCTS</a> |
+            <a href="/about-us" style="color: #21c7df; font-size: 15px; font-weight: 600">ABOUT US</a> |
+            <a href="/ContactUs" style="color: #21c7df; font-size: 15px; font-weight: 600">CONTACT US</a>
+        </nav>
+        <div class="search-box store-search-box">
+        </div>
+    </div>
     @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.HeaderAfter })
 </div>
+
+<script>
+    $(document).ready(function() {
+        alert( "ready!" );
+    });
+</script>

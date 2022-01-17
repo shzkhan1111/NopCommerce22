@@ -333,6 +333,10 @@ namespace Nop.Web.Infrastructure
                 pattern: $"{lang}/rewardpoints/history",
                 defaults: new { controller = "Order", action = "CustomerRewardPoints" });
 
+            endpointRouteBuilder.MapControllerRoute(name: "AdminLogin",
+                pattern: $"{lang}/admin/login",
+                defaults: new { controller = "Customer", action = "AdminLogin" });
+
             endpointRouteBuilder.MapControllerRoute(name: "CustomerRewardPointsPaged",
                 pattern: $"{lang}/rewardpoints/history/page/{{pageNumber:min(0)}}",
                 defaults: new { controller = "Order", action = "CustomerRewardPoints" });

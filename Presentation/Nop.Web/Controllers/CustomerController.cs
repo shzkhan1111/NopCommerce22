@@ -425,6 +425,19 @@ namespace Nop.Web.Controllers
             return View(model);
         }
 
+        //available even when a store is closed
+        [CheckAccessClosedStore(true)]
+        //available even when navigation is not allowed
+        [CheckAccessPublicStore(true)]
+        /// <returns>A task that represents the asynchronous operation</returns>
+        public virtual async Task<IActionResult> AdminLogin(bool? checkoutAsGuest)
+        {
+            var model = await _customerModelFactory.PrepareLoginModelAsync(checkoutAsGuest);
+
+            return View(model);
+        }
+
+
         [HttpPost]
         [ValidateCaptcha]
         //available even when a store is closed
@@ -456,6 +469,76 @@ namespace Nop.Web.Controllers
                                 : await _customerService.GetCustomerByEmailAsync(customerEmail);
 
                             return await _customerRegistrationService.SignInCustomerAsync(customer, returnUrl, model.RememberMe);
+                        }
+                    case CustomerLoginResults.MultiFactorAuthenticationRequired:
+                        {
+                            var customerMultiFactorAuthenticationInfo = new CustomerMultiFactorAuthenticationInfo
+                            {
+                                UserName = userNameOrEmail,
+                                RememberMe = model.RememberMe,
+                                ReturnUrl = returnUrl
+                            };
+                            HttpContext.Session.Set(NopCustomerDefaults.CustomerMultiFactorAuthenticationInfo, customerMultiFactorAuthenticationInfo);
+                            return RedirectToRoute("MultiFactorVerification");
+                        }
+                    case CustomerLoginResults.CustomerNotExist:
+                        ModelState.AddModelError("", await _localizationService.GetResourceAsync("Account.Login.WrongCredentials.CustomerNotExist"));
+                        break;
+                    case CustomerLoginResults.Deleted:
+                        ModelState.AddModelError("", await _localizationService.GetResourceAsync("Account.Login.WrongCredentials.Deleted"));
+                        break;
+                    case CustomerLoginResults.NotActive:
+                        ModelState.AddModelError("", await _localizationService.GetResourceAsync("Account.Login.WrongCredentials.NotActive"));
+                        break;
+                    case CustomerLoginResults.NotRegistered:
+                        ModelState.AddModelError("", await _localizationService.GetResourceAsync("Account.Login.WrongCredentials.NotRegistered"));
+                        break;
+                    case CustomerLoginResults.LockedOut:
+                        ModelState.AddModelError("", await _localizationService.GetResourceAsync("Account.Login.WrongCredentials.LockedOut"));
+                        break;
+                    case CustomerLoginResults.WrongPassword:
+                    default:
+                        ModelState.AddModelError("", await _localizationService.GetResourceAsync("Account.Login.WrongCredentials"));
+                        break;
+                }
+            }
+
+            //If we got this far, something failed, redisplay form
+            model = await _customerModelFactory.PrepareLoginModelAsync(model.CheckoutAsGuest);
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateCaptcha]
+        //available even when a store is closed
+        [CheckAccessClosedStore(true)]
+        //available even when navigation is not allowed
+        [CheckAccessPublicStore(true)]
+        /// <returns>A task that represents the asynchronous operation</returns>
+        public virtual async Task<IActionResult> AdminLogin(LoginModel model, string returnUrl, bool captchaValid)
+        {
+            //validate CAPTCHA
+            if (_captchaSettings.Enabled && _captchaSettings.ShowOnLoginPage && !captchaValid)
+            {
+                ModelState.AddModelError("", await _localizationService.GetResourceAsync("Common.WrongCaptchaMessage"));
+            }
+
+            if (ModelState.IsValid)
+            {
+                var customerUserName = model.Username?.Trim();
+                var customerEmail = model.Email?.Trim();
+                var userNameOrEmail = _customerSettings.UsernamesEnabled ? customerUserName : customerEmail;
+
+                var loginResult = await _customerRegistrationService.ValidateCustomerAsync(userNameOrEmail, model.Password);
+                switch (loginResult)
+                {
+                    case CustomerLoginResults.Successful:
+                        {
+                            var customer = _customerSettings.UsernamesEnabled
+                                ? await _customerService.GetCustomerByUsernameAsync(customerUserName)
+                                : await _customerService.GetCustomerByEmailAsync(customerEmail);
+
+                            return await _customerRegistrationService.SignInAdminCustomerAsync(customer, returnUrl, model.RememberMe);
                         }
                     case CustomerLoginResults.MultiFactorAuthenticationRequired:
                         {

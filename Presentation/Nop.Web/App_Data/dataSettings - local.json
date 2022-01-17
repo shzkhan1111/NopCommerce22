@@ -1,5 +1,5 @@
 ﻿{
-  "DataConnectionString": "Data Source=DESKTOP-E30NNSG\\SQLEXPRESS;Initial Catalog=nopCommerceDb2;Integrated Security=True;Persist Security Info=False",
+  "DataConnectionString": "Data Source=DESKTOP-B7NP3HM\\SQLEXPRESS;Initial Catalog=NopCommerce_Dist;Integrated Security=True;Persist Security Info=False",
   "DataProvider": "sqlserver",
   "SQLCommandTimeout": null,
   "RawDataSettings": {}

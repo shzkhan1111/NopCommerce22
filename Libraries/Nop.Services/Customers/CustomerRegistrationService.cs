@@ -439,6 +439,33 @@ namespace Nop.Services.Customers
             return new RedirectToRouteResult("Homepage", null);
         }
 
+        public virtual async Task<IActionResult> SignInAdminCustomerAsync(Customer customer, string returnUrl, bool isPersist = false)
+        {
+            if ((await _workContext.GetCurrentCustomerAsync())?.Id != customer.Id)
+            {
+                //migrate shopping cart
+                await _shoppingCartService.MigrateShoppingCartAsync(await _workContext.GetCurrentCustomerAsync(), customer, true);
+
+                await _workContext.SetCurrentCustomerAsync(customer);
+            }
+
+            //sign in new customer
+            await _authenticationService.SignInAsync(customer, isPersist);
+
+            //raise event       
+            await _eventPublisher.PublishAsync(new CustomerLoggedinEvent(customer));
+
+            //activity log
+            await _customerActivityService.InsertActivityAsync(customer, "PublicStore.Login",
+                await _localizationService.GetResourceAsync("ActivityLog.PublicStore.Login"), customer);
+
+            //redirect to the return URL if it's specified
+            if (!string.IsNullOrEmpty(returnUrl))
+                return new RedirectResult(returnUrl);
+
+            return new RedirectResult("/Admin");
+        }
+
         /// <summary>
         /// Sets a user email
         /// </summary>
