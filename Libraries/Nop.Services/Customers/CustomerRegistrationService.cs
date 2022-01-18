@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -177,6 +178,78 @@ namespace Nop.Services.Customers
                 return CustomerLoginResults.MultiFactorAuthenticationRequired;
             if (!string.IsNullOrEmpty(selectedProvider))
                 _notificationService.WarningNotification(await _localizationService.GetResourceAsync("MultiFactorAuthentication.Notification.SelectedMethodIsNotActive"));
+
+            //update login details
+            customer.FailedLoginAttempts = 0;
+            customer.CannotLoginUntilDateUtc = null;
+            customer.RequireReLogin = false;
+            customer.LastLoginDateUtc = DateTime.UtcNow;
+            await _customerService.UpdateCustomerAsync(customer);
+
+            return CustomerLoginResults.Successful;
+        }
+
+        /// <summary>
+        /// Validate Admin Customer
+        /// </summary>
+        /// <param name="usernameOrEmail">Username or email</param>
+        /// <param name="password">Password</param>
+        /// <returns>
+        /// A task that represents the asynchronous operation
+        /// The task result contains the result
+        /// </returns>
+        public virtual async Task<CustomerLoginResults> ValidateAdminCustomerAsync(string usernameOrEmail, string password)
+        {
+            var customer = _customerSettings.UsernamesEnabled ?
+                await _customerService.GetCustomerByUsernameAsync(usernameOrEmail) :
+                await _customerService.GetCustomerByEmailAsync(usernameOrEmail);
+
+
+            if (customer == null)
+                return CustomerLoginResults.CustomerNotExist;
+            if (customer.Deleted)
+                return CustomerLoginResults.Deleted;
+            if (!customer.Active)
+                return CustomerLoginResults.NotActive;
+            //only registered can login
+            if (!await _customerService.IsRegisteredAsync(customer))
+                return CustomerLoginResults.NotRegistered;
+            //check whether a customer is locked out
+            if (customer.CannotLoginUntilDateUtc.HasValue && customer.CannotLoginUntilDateUtc.Value > DateTime.UtcNow)
+                return CustomerLoginResults.LockedOut;
+
+            if (!PasswordsMatch(await _customerService.GetCurrentPasswordAsync(customer.Id), password))
+            {
+                //wrong password
+                customer.FailedLoginAttempts++;
+                if (_customerSettings.FailedPasswordAllowedAttempts > 0 &&
+                    customer.FailedLoginAttempts >= _customerSettings.FailedPasswordAllowedAttempts)
+                {
+                    //lock out
+                    customer.CannotLoginUntilDateUtc = DateTime.UtcNow.AddMinutes(_customerSettings.FailedPasswordLockoutMinutes);
+                    //reset the counter
+                    customer.FailedLoginAttempts = 0;
+                }
+
+                await _customerService.UpdateCustomerAsync(customer);
+
+                return CustomerLoginResults.WrongPassword;
+            }
+
+            var selectedProvider = await _genericAttributeService.GetAttributeAsync<string>(customer, NopCustomerDefaults.SelectedMultiFactorAuthenticationProviderAttribute);
+            var methodIsActive = await _multiFactorAuthenticationPluginManager.IsPluginActiveAsync(selectedProvider, customer, (await _storeContext.GetCurrentStoreAsync()).Id);
+            if (methodIsActive)
+                return CustomerLoginResults.MultiFactorAuthenticationRequired;
+            if (!string.IsNullOrEmpty(selectedProvider))
+                _notificationService.WarningNotification(await _localizationService.GetResourceAsync("MultiFactorAuthentication.Notification.SelectedMethodIsNotActive"));
+
+            // If all set, then check customer role
+            System.Collections.Generic.List<CustomerRole> customerRoles = (System.Collections.Generic.List<CustomerRole>) await _customerService.GetCustomerRolesAsync(customer);
+
+            if (customerRoles.SingleOrDefault(cr => cr.Name == "Administrators") == null)
+            {
+                return CustomerLoginResults.CustomerNotExist;
+            }
 
             //update login details
             customer.FailedLoginAttempts = 0;

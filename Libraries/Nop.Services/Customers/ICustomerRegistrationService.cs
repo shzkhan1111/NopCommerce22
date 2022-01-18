@@ -21,6 +21,17 @@ namespace Nop.Services.Customers
         Task<CustomerLoginResults> ValidateCustomerAsync(string usernameOrEmail, string password);
 
         /// <summary>
+        /// Validate Admin customer
+        /// </summary>
+        /// <param name="usernameOrEmail">Username or email</param>
+        /// <param name="password">Password</param>
+        /// <returns>
+        /// A task that represents the asynchronous operation
+        /// The task result contains the result
+        /// </returns>
+        Task<CustomerLoginResults> ValidateAdminCustomerAsync(string usernameOrEmail, string password);
+
+        /// <summary>
         /// Register customer
         /// </summary>
         /// <param name="request">Request</param>

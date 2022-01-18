@@ -529,7 +529,7 @@ namespace Nop.Web.Controllers
                 var customerEmail = model.Email?.Trim();
                 var userNameOrEmail = _customerSettings.UsernamesEnabled ? customerUserName : customerEmail;
 
-                var loginResult = await _customerRegistrationService.ValidateCustomerAsync(userNameOrEmail, model.Password);
+                var loginResult = await _customerRegistrationService.ValidateAdminCustomerAsync(userNameOrEmail, model.Password);
                 switch (loginResult)
                 {
                     case CustomerLoginResults.Successful:
